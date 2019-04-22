@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: trace-deployment
+  labels:
+    app: express-trace
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: express-trace
+  template:
+    metadata:
+      labels:
+        app: express-trace
+    spec:
+      volumes:
+      - name: stackdriver-tracing
+        secret:
+          secretName: stackdriver-tracing
+      containers:
+      - name: express-trace
+        image: gcr.io/csp-testing/express-trace:latest
+        volumeMounts:
+        - name: stackdriver-tracing
+          mountPath: /var/secrets/google
+        env:
+        - name: GOOGLE_APPLICATION_CREDENTIALS
+          value: /var/secrets/google/stackdriver-tracing.json
+        ports:
+        - containerPort: 8080

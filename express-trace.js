@@ -18,7 +18,7 @@
 require('@google-cloud/trace-agent').start();
 //Stackdriver Logging setup
 const Logging = require('@google-cloud/logging');
-const PROJECT_ID='ymg-stackdriver-trace'
+const PROJECT_ID='csp-testing'
 const logging = Logging({
     projectId: PROJECT_ID
   });
@@ -42,11 +42,11 @@ const metadata = { resource: { type: 'global' } };
 app.get('/', (req, res) => {
     console.log('Inbound request received!');
     //outbound HTTP request should be traced
-    const myReq = http.request(options, (res) => {
-        console.log('making outbound request to ' + res.url);
+    const myReq = http.request(options, (httpRes) => {
+        console.log('making outbound request to ' + httpRes.url);
         //---------- Stackdriver Logging ----------------
         //send log message to Stackdriver logging
-        const entry = log.entry(metadata, "Outbound request to " + res.url);
+        const entry = log.entry(metadata, "Outbound request to " + httpRes.url);
         // Writes the log entry
         log.write(entry)
             .then(() => {
